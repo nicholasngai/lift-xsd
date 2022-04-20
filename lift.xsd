@@ -124,15 +124,10 @@
       <xs:element name="field" type="field-defn" minOccurs="0" maxOccurs="unbounded"/>
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="ranges">
-    <xs:choice>
-      <!-- TODO v0.13 mentions range-ref items, but I have no idea what those are. -->
-    </xs:choice>
-  </xs:complexType>
   <xs:complexType name="header">
     <xs:choice>
       <xs:element name="description" type="multitext" minOccurs="0"/>
-      <xs:element name="ranges" type="ranges" minOccurs="0"/>
+      <xs:element name="ranges" type="lift-ranges" minOccurs="0"/>
       <xs:element name="fields" type="field-defns" minOccurs="0"/>
     </xs:choice>
   </xs:complexType>
@@ -143,6 +138,32 @@
     </xs:choice>
     <xs:attribute name="version" type="xs:string" use="required"/>
     <xs:attribute name="producer" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="range-element">
+    <xs:choice>
+      <xs:element name="description" type="multitext" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="label" type="multitext" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="abbrev" type="multitext" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:choice>
+    <xs:attribute name="id" type="key" use="required"/>
+    <xs:attribute name="parent" type="key"/>
+    <xs:attribute name="guid" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="range">
+    <xs:choice>
+      <xs:element name="description" type="multitext" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="range" type="range-element" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:element name="label" type="multitext" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="abbrev" type="multitext" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:choice>
+    <xs:attribute name="id" type="key" use="required"/>
+    <xs:attribute name="guid" type="xs:string"/>
+    <xs:attribute name="href" type="url"/>
+  </xs:complexType>
+  <xs:complexType name="lift-ranges">
+    <xs:choice>
+      <xs:element name="range" type="range" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:choice>
   </xs:complexType>
 
   <!-- Elements. -->
