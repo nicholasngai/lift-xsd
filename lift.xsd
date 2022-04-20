@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://github.com/sillsdev/lift-standard" targetNamespace="https://github.com/sillsdev/lift-standard" elementFormDefault="qualified">
+  <!-- Simple types. -->
+  <xs:simpleType name="pcdata">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="lang">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="key">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="refid">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="url">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <!-- Complex types. -->
+  <xs:complexType name="spantype" mixed="true">
+    <xs:choice>
+      <xs:element ref="span" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:choice>
+    <xs:attribute name="lang" type="lang"/>
+    <xs:attribute name="href" type="url"/>
+    <xs:attribute name="class" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="multitext">
+    <xs:choice>
+      <xs:element name="text" type="xs:string"/>
+      <xs:choice>
+        <xs:element ref="form" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="trait" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:choice>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="URLRef">
+    <xs:choice>
+      <xs:element name="label" type="multitext" minOccurs="0"/>
+    </xs:choice>
+    <xs:attribute name="href" type="url"/>
+  </xs:complexType>
+  <xs:complexType name="extensible">
+    <xs:choice>
+      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="dateModified" type="xs:dateTime" minOccurs="0"/>
+      <xs:element ref="field" minOccurs="0" maxOccurs="0"/>
+      <!-- TODO v0.13 of the spec defines this as a flag type, but I have no idea what that is. -->
+      <xs:element ref="trait" minOccurs="0" maxOccurs="0"/>
+      <xs:element ref="annotation" minOccurs="0" maxOccurs="0"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="multitextextensible">
+    <xs:complexContent>
+      <xs:extension base="multitext">
+        <xs:choice>
+          <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="dateModified" type="xs:dateTime" minOccurs="0"/>
+          <xs:element ref="field" minOccurs="0" maxOccurs="0"/>
+          <!-- TODO v0.13 of the spec defines this as a flag type, but I have no idea what that is. -->
+          <xs:element ref="trait" minOccurs="0" maxOccurs="0"/>
+          <xs:element ref="annotation" minOccurs="0" maxOccurs="0"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="formtype">
+    <xs:choice>
+      <xs:element ref="text" minOccurs="1"/>
+      <xs:element ref="annotation" maxOccurs="unbounded"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="reversaltype">
+    <xs:complexContent>
+      <xs:extension base="multitext">
+        <xs:choice>
+          <xs:element name="main" type="reversaltype" minOccurs="0"/>
+          <xs:element ref="grammatical-info" minOccurs="0"/>
+        </xs:choice>
+        <xs:attribute name="value" type="key" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="phonetictype">
+    <xs:complexContent>
+      <xs:extension base="multitextextensible">
+        <!-- TODO Moving minOccurs and maxOccurs to children throws an error. -->
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="media" type="URLRef"/>
+          <xs:element name="form" type="spantype"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="sensetype">
+    <xs:complexContent>
+      <xs:extension base="extensible">
+        <xs:choice>
+          <xs:element ref="grammatical-info" minOccurs="0"/>
+          <xs:element name="gloss" type="formtype" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="definition" type="multitext" minOccurs="0"/>
+          <xs:element ref="relation" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="example" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="reversal" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="illustration" type="URLRef" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="subsense" type="sensetype" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:choice>
+        <xs:attribute name="id" type="refid"/>
+        <xs:attribute name="order" type="xs:integer"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="field-defn">
+    <xs:complexContent>
+      <xs:extension base="multitext">
+        <xs:attribute name="tag" type="key"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="field-defns">
+    <xs:choice>
+      <xs:element name="field" type="field-defn" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ranges">
+    <xs:choice>
+      <!-- TODO v0.13 mentions range-ref items, but I have no idea what those are. -->
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="header">
+    <xs:choice>
+      <xs:element name="description" type="multitext" minOccurs="0"/>
+      <xs:element name="ranges" type="ranges" minOccurs="0"/>
+      <xs:element name="fields" type="field-defns" minOccurs="0"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="lift">
+    <xs:choice>
+      <xs:element name="header" type="header" minOccurs="0"/>
+      <xs:element ref="entry" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:choice>
+    <xs:attribute name="version" type="xs:string" use="required"/>
+    <xs:attribute name="producer" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- Elements. -->
+  <xs:element name="span" type="spantype"/>
+  <xs:element name="text">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="span"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="form" type="formtype"/>
+  <xs:element name="field">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="multitext">
+          <!-- TODO Moving minOccurs and maxOccurs to children throws an error. -->
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <!-- TODO v0.13 of the spec defines this as a flag type, but I have no idea what that is. -->
+            <xs:element ref="trait"/>
+            <!-- TODO v0.13 of the spec defines this as a span type, but Fieldworks seems to use a form type. -->
+            <xs:element ref="form"/>
+            <xs:element ref="annotation"/>
+          </xs:choice>
+          <xs:attribute name="type" type="key" use="required"/>
+          <xs:attribute name="dateCreated" type="xs:dateTime"/>
+          <xs:attribute name="dateModified" type="xs:dateTime"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="trait">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="annotation" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:choice>
+      <xs:attribute name="name" type="key" use="required"/>
+      <xs:attribute name="value" type="key" use="required"/>
+      <xs:attribute name="id" type="key"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="annotation">
+    <xs:complexType>
+      <xs:attribute name="name" type="key" use="required"/>
+      <xs:attribute name="value" type="key" use="required"/>
+      <xs:attribute name="who" type="key"/>
+      <xs:attribute name="when" type="xs:dateTime"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="note">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="multitextextensible">
+          <xs:attribute name="type" type="key"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="etymology">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extensible">
+          <xs:choice>
+            <xs:element name="gloss" type="formtype" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="form" type="formtype"/>
+          </xs:choice>
+          <xs:attribute name="type" type="key" use="required"/>
+          <xs:attribute name="source" type="xs:string" use="required"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grammatical-info">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="trait" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:choice>
+      <xs:attribute name="value" type="key" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="reversal" type="reversaltype"/>
+  <xs:element name="translation">
+    <xs:complexType>
+      <xs:attribute name="type" type="key"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="example">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="multitextextensible">
+          <xs:choice>
+            <xs:element ref="translation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:choice>
+          <xs:attribute name="source" type="key"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="relation">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extensible">
+          <xs:choice>
+            <xs:element ref="translation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:choice>
+          <xs:attribute name="type" type="key" use="required"/>
+          <xs:attribute name="ref" type="refid" use="required"/>
+          <xs:attribute name="order" type="xs:integer"/>
+          <!-- TODO v0.13 of the spec defines this as a multitext, but that's not a simple type. -->
+          <xs:attribute name="usage" type="xs:string"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="variant">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="multitextextensible">
+          <xs:choice>
+            <xs:element name="pronunciation" type="phonetictype" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="relation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:choice>
+          <!-- TODO v0.13 of the spec defines this as a refentry... I think it's supposd to be a refid -->
+          <xs:attribute name="ref" type="refid"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sense" type="sensetype"/>
+  <xs:element name="entry">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="extensible">
+          <xs:choice>
+            <xs:element name="lexical-unit" type="multitext" minOccurs="0"/>
+            <xs:element name="citation" type="multitext" minOccurs="0"/>
+            <xs:element name="pronunciation" type="phonetictype" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="variant" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="sense" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="relation" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="etymology" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:choice>
+          <xs:attribute name="type" type="key" use="required"/>
+          <xs:attribute name="ref" type="refid" use="required"/>
+          <xs:attribute name="order" type="xs:integer"/>
+          <!-- TODO v0.13 of the spec defines this as a multitext, but that's not a simple type. -->
+          <xs:attribute name="usage" type="xs:string"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="lift" type="lift"/>
+</xs:schema>
