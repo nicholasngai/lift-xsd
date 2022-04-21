@@ -160,7 +160,12 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="translation">
-    <xs:attribute name="type" type="key"/>
+    <!-- TODO This isn't marked explicitly an an inheritance relationship, but it's in paragraph. -->
+    <xs:complexContent>
+      <xs:extension base="multitext">
+        <xs:attribute name="type" type="key"/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="example">
     <xs:complexContent>
