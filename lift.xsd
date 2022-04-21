@@ -45,6 +45,7 @@
       <xs:element name="text" type="text" minOccurs="1" maxOccurs="1"/>
       <xs:element name="annotation" type="annotation" minOccurs="0"/>
     </xs:choice>
+    <xs:attribute name="lang" type="lang"/>
   </xs:complexType>
   <xs:complexType name="URLRef">
       <xs:choice maxOccurs="unbounded">
@@ -77,32 +78,38 @@
     <xs:attribute name="id" type="key"/>
   </xs:complexType>
   <xs:complexType name="annotation">
-    <xs:attribute name="name" type="key" use="required"/>
-    <xs:attribute name="value" type="key" use="required"/>
-    <xs:attribute name="who" type="key"/>
-    <xs:attribute name="when" type="xs:dateTime"/>
+    <xs:complexContent>
+      <xs:extension base="multitext">
+        <xs:attribute name="name" type="key" use="required"/>
+        <xs:attribute name="value" type="key" use="required"/>
+        <xs:attribute name="who" type="key"/>
+        <xs:attribute name="when" type="xs:dateTime"/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="extensible">
     <xs:choice maxOccurs="unbounded">
-      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="dateModified" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
       <xs:element name="field" type="field" minOccurs="0" maxOccurs="1"/>
       <!-- TODO v0.13 of the spec defines this as a flag type, but I have no idea what that is. -->
       <xs:element name="trait" type="trait" minOccurs="0"/>
       <xs:element name="annotation" type="annotation" minOccurs="0"/>
     </xs:choice>
+    <!-- TODO v0.13 of the spec says these are elements, but these are definitely attributes. -->
+    <xs:attribute name="dateCreated" type="xs:dateTime"/>
+    <xs:attribute name="dateModified" type="xs:dateTime"/>
   </xs:complexType>
   <xs:complexType name="multitextextensible">
     <xs:complexContent>
       <xs:extension base="multitext">
         <xs:choice maxOccurs="unbounded">
-          <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
-          <xs:element name="dateModified" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
           <xs:element name="field" type="field" minOccurs="0" maxOccurs="1"/>
           <!-- TODO v0.13 of the spec defines this as a flag type, but I have no idea what that is. -->
           <xs:element name="trait" type="trait" minOccurs="0"/>
           <xs:element name="annotation" type="annotation" minOccurs="0"/>
         </xs:choice>
+        <!-- TODO v0.13 of the spec says these are elements, but these are definitely attributes. -->
+        <xs:attribute name="dateCreated" type="xs:dateTime"/>
+        <xs:attribute name="dateModified" type="xs:dateTime"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -223,11 +230,10 @@
           <xs:element name="relation" type="relation" minOccurs="0"/>
           <xs:element name="etymology" type="etymology" minOccurs="0"/>
         </xs:choice>
-        <xs:attribute name="type" type="key" use="required"/>
-        <xs:attribute name="ref" type="refid" use="required"/>
+        <xs:attribute name="id" type="refid"/>
         <xs:attribute name="order" type="xs:integer"/>
-        <!-- TODO v0.13 of the spec defines this as a multitext, but that's not a simple type. -->
-        <xs:attribute name="usage" type="xs:string"/>
+        <xs:attribute name="guid" type="xs:string"/>
+        <xs:attribute name="dateDeleted" type="xs:dateTime"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
